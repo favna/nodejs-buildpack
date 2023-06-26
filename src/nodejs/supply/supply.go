@@ -315,21 +315,17 @@ func (s *Supplier) BuildDependencies() error {
 		return err
 	}
 
-	switch {
-	case s.UseYarn:
-		if err := s.Yarn.Build(s.Stager.BuildDir(), s.Stager.CacheDir()); err != nil {
-			return err
-		}
-
-	case s.IsVendored:
+	if s.IsVendored {
 		s.Log.Info("Prebuild detected (node_modules already exists)")
-		if err := s.NPM.Rebuild(s.Stager.BuildDir()); err != nil {
-			return err
-		}
-
-	default:
-		if err := s.NPM.Build(s.Stager.BuildDir(), s.Stager.CacheDir()); err != nil {
-			return err
+	} else {
+		if s.UseYarn {
+			if err := s.Yarn.Build(s.Stager.BuildDir(), s.Stager.CacheDir()); err != nil {
+				return err
+			}
+		} else {
+			if err := s.NPM.Build(s.Stager.BuildDir(), s.Stager.CacheDir()); err != nil {
+				return err
+			}
 		}
 	}
 
