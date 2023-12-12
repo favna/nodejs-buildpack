@@ -4,7 +4,6 @@ on:
   pull_request:
     branches:
       - develop
-      - feat/add-yarn-berry-support
 
 jobs:
   unit:
@@ -24,8 +23,6 @@ jobs:
 
       - name: Run Unit Tests
         run: ./scripts/unit.sh
-        env:
-          TERM: dumb
 
   integration-matrix:
     name: Integration Matrix

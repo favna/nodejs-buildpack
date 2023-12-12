@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"regexp"
 	"strings"
 
 	"github.com/cloudfoundry/libbuildpack"
@@ -67,24 +66,6 @@ func (y *Yarn) executeCommandAndGetStdout(buildDir string, args ...string) ([]by
 	return cmd.Output()
 }
 
-func (y *Yarn) parseStdoutResponse(stdoutResponse []byte) string {
-	result := fmt.Sprintf("%s", strings.TrimSpace(string(stdoutResponse)))
-
-	println(">>>> Printing result", result)
-
-	re := regexp.MustCompile(`(?:\\x9[bB]|\\x1[bB]\[)[0-?]*[ -/]*[@-~]`)
-
-	println(">>>> Printing regex as string", re.String())
-
-	replaced := re.ReplaceAllString(result, "")
-	replaced2 := re.ReplaceAllLiteralString(result, "")
-
-	println(">>>> Printing replaced", replaced)
-	println(">>>> Printing replaced2", replaced2)
-
-	return replaced
-}
-
 func (y *Yarn) getYarnVersion(buildDir string) (string, error) {
 	output, err := y.executeCommandAndGetStdout(buildDir, "--version")
 
@@ -92,7 +73,7 @@ func (y *Yarn) getYarnVersion(buildDir string) (string, error) {
 		return "", err
 	}
 
-	yarnVersion := y.parseStdoutResponse(output)
+	yarnVersion := strings.TrimSpace(string(output))
 	return yarnVersion, nil
 }
 
@@ -103,9 +84,9 @@ func (y *Yarn) isYarnGlobalCacheEnabled(buildDir string) (bool, error) {
 		return true, err
 	}
 
-	result := y.parseStdoutResponse(output)
+	result := strings.TrimSpace(string(output))
 
-	println("<<<< resolved result:", result)
+	println(fmt.Sprintf("resolved result: %v", result))
 
 	if strings.Contains(result, "true") {
 		println("In the result == true branch")
@@ -126,7 +107,7 @@ func (y *Yarn) getYarnCacheFolder(buildDir string) string {
 		return ".yarn/cache"
 	}
 
-	result := y.parseStdoutResponse(output)
+	result := strings.TrimSpace(string(output))
 	return result
 }
 
