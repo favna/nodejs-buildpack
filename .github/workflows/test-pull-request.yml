@@ -24,6 +24,8 @@ jobs:
 
       - name: Run Unit Tests
         run: ./scripts/unit.sh
+        env:
+          TERM: dumb
 
   integration-matrix:
     name: Integration Matrix
