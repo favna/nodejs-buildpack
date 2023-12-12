@@ -70,17 +70,17 @@ func (y *Yarn) executeCommandAndGetStdout(buildDir string, args ...string) ([]by
 func (y *Yarn) parseStdoutResponse(stdoutResponse []byte) string {
 	result := strings.TrimSpace(string(stdoutResponse))
 
-	y.Log.Info(result)
+	println(">>>> Printing result", result)
 
 	re := regexp.MustCompile(`(?i)(?:\\x9B|\\x1B\[)[0-?]*[ -/]*[@-~]`)
 
-	y.Log.Info(re.String())
+	println(">>>> Printing )", re.String())
 
 	replaced := re.ReplaceAllString(result, "")
 	replaced2 := re.ReplaceAllLiteralString(result, "")
 
-	y.Log.Info(replaced)
-	y.Log.Info(replaced2)
+	println(">>>> Printing replaced", replaced)
+	println(">>>> Printing replaced2", replaced2)
 
 	return replaced
 }
