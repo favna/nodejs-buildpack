@@ -1,7 +1,6 @@
 package yarn
 
 import (
-	"fmt"
 	"io"
 	"os"
 	"os/exec"
@@ -80,25 +79,16 @@ func (y *Yarn) getYarnVersion(buildDir string) (string, error) {
 func (y *Yarn) isYarnGlobalCacheEnabled(buildDir string) (bool, error) {
 	output, err := y.executeCommandAndGetStdout(buildDir, "config", "get", "enableGlobalCache")
 	if err != nil {
-		println("In the err != nil branch")
 		return true, err
 	}
 
 	result := strings.TrimSpace(string(output))
 
-	println(fmt.Sprintf("resolved result: %v", result))
-
 	if strings.Contains(result, "true") {
-		println("In the result == true branch")
 		return true, nil
-	} else if strings.Contains(result, "false") {
-		println("In the result == false branch")
-		return false, nil
 	}
 
-	println("In the result == neither branch, an error should get formatted below")
-
-	return true, fmt.Errorf("unexpected output from yarn config get enableGlobalCache: %s", result)
+	return false, nil
 }
 
 func (y *Yarn) getYarnCacheFolder(buildDir string) string {
@@ -174,8 +164,6 @@ func (y *Yarn) doBuildBerry(buildDir string) error {
 	}
 
 	installArgs := []string{"install", "--immutable"}
-
-	println(fmt.Sprintf("resolved useGlobalCache: %v", useGlobalCache))
 
 	if useGlobalCache {
 		y.Log.Info("Yarn is using global cache, cache is allowed to be mutable")
