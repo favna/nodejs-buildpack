@@ -68,7 +68,7 @@ func (y *Yarn) executeCommandAndGetStdout(buildDir string, args ...string) ([]by
 }
 
 func (y *Yarn) parseStdoutResponse(stdoutResponse []byte) string {
-	result := strings.TrimSpace(string(stdoutResponse))
+	result := fmt.Sprintf(strings.TrimSpace(string(stdoutResponse)))
 
 	println(">>>> Printing result", result)
 
