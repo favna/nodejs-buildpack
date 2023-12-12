@@ -72,9 +72,9 @@ func (y *Yarn) parseStdoutResponse(stdoutResponse []byte) string {
 
 	println(">>>> Printing result", result)
 
-	re := regexp.MustCompile(`(?i)(?:\\x9B|\\x1B\[)[0-?]*[ -/]*[@-~]`)
+	re := regexp.MustCompile(`(?:\\x9[bB]|\\x1[bB]\[)[0-?]*[ -/]*[@-~]`)
 
-	println(">>>> Printing )", re.String())
+	println(">>>> Printing", re.String())
 
 	replaced := re.ReplaceAllString(result, "")
 	replaced2 := re.ReplaceAllLiteralString(result, "")
@@ -105,7 +105,7 @@ func (y *Yarn) isYarnGlobalCacheEnabled(buildDir string) (bool, error) {
 
 	result := y.parseStdoutResponse(output)
 
-	println(fmt.Sprintf("resolved result: %v", result))
+	println("<<<< resolved result:", result)
 
 	if result == "true" {
 		println("In the result == true branch")
