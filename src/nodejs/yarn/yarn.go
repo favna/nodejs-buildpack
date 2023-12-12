@@ -74,7 +74,7 @@ func (y *Yarn) parseStdoutResponse(stdoutResponse []byte) string {
 
 	re := regexp.MustCompile(`(?:\\x9[bB]|\\x1[bB]\[)[0-?]*[ -/]*[@-~]`)
 
-	println(">>>> Printing", re.String())
+	println(">>>> Printing regex as string", re.String())
 
 	replaced := re.ReplaceAllString(result, "")
 	replaced2 := re.ReplaceAllLiteralString(result, "")
@@ -107,10 +107,10 @@ func (y *Yarn) isYarnGlobalCacheEnabled(buildDir string) (bool, error) {
 
 	println("<<<< resolved result:", result)
 
-	if result == "true" {
+	if strings.Contains(result, "true") {
 		println("In the result == true branch")
 		return true, nil
-	} else if result == "false" {
+	} else if strings.Contains(result, "false") {
 		println("In the result == false branch")
 		return false, nil
 	}
