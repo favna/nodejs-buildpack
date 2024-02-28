@@ -443,11 +443,7 @@ func (s *Supplier) ReadPackageJSON() error {
 		if !isYarnV1 && yarnNodeLinker == "pnp" {
 			s.Log.Info("Yarn Berry is using Plug'n'Play (PnP) mode, detecting if Zero Installs is enabled by checking if the Yarn cache folder exists. For more information visit https://yarnpkg.com/features/pnp")
 
-			possibleYarnCacheFolder := append([]string{s.Stager.BuildDir()}, strings.Split(yarnCacheFolder, "/")...)
-
-			s.Log.Info("Possible Yarn cache folder: %v", possibleYarnCacheFolder)
-
-			yarnCacheDirExists, err2 := libbuildpack.FileExists(filepath.Join(possibleYarnCacheFolder...))
+			yarnCacheDirExists, err2 := libbuildpack.FileExists(filepath.Join(yarnCacheFolder))
 
 			s.Log.Info("Yarn cache folder exists: %t", yarnCacheDirExists)
 
