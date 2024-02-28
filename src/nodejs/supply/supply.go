@@ -413,13 +413,16 @@ func (s *Supplier) ReadPackageJSON() error {
 	if s.UseYarn, err = libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), "yarn.lock")); err != nil {
 		return err
 	}
+	s.Log.Info("UseYarn after first if check for yarn.lock: %t", s.UseYarn)
 
 	// If we didn't find yarn.lock, check if we have a .yarn folder and set UseYarn to true if we do
 	if !s.UseYarn {
+		s.Log.Info("UseYarn before second if check for .yarn: %t", s.UseYarn)
 		if s.UseYarn, err = libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), ".yarn")); err != nil {
 			return err
 		}
 	}
+	s.Log.Info("UseYarn after second if check for .yarn: %t", s.UseYarn)
 
 	// If we are using Yarn then we need to check if the cache folder exists for Yarn berry Zero Installs
 	if s.UseYarn {
@@ -438,12 +441,26 @@ func (s *Supplier) ReadPackageJSON() error {
 
 		if !isYarnV1 && yarnNodeLinker == "pnp" {
 			s.Log.Info("Yarn Berry is using Plug'n'Play (PnP) mode, detecting if Zero Installs is enabled by checking if the Yarn cache folder exists. For more information visit https://yarnpkg.com/features/pnp")
+
+			err := filepath.Walk(s.Stager.BuildDir(), func(path string, info os.FileInfo, err error) error {
+				if err != nil {
+					return err
+				}
+				s.Log.Info("File name in s.Stager.BuildDir: %s", path)
+				return nil
+			})
+
+			if err != nil {
+				s.Log.Error("Error walking the path %v: %v", s.Stager.BuildDir(), err)
+			}
+
 			if s.IsVendored, err = libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), yarnCacheFolder)); err != nil {
-				s.Log.Info("yarn cache folder seemingly does not exist: %s", err)
+				s.Log.Info("Yarn cache folder seemingly does not exist: %s", err)
 				return err
 			}
 		}
 	}
+	s.Log.Info("IsVendored after checking it the yarn way: %t", s.IsVendored)
 
 	// If IsVendored was not set to true then we're either using Yarn without Zero Installs, or we're using NPM
 	if !s.IsVendored {
