@@ -443,21 +443,21 @@ func (s *Supplier) ReadPackageJSON() error {
 		if !isYarnV1 && yarnNodeLinker == "pnp" {
 			s.Log.Info("Yarn Berry is using Plug'n'Play (PnP) mode, detecting if Zero Installs is enabled by checking if the Yarn cache folder exists. For more information visit https://yarnpkg.com/features/pnp")
 
-			err := filepath.Walk(s.Stager.BuildDir(), func(path string, info os.FileInfo, err error) error {
-				if err != nil {
-					return err
-				}
-				s.Log.Info("File name in s.Stager.BuildDir: %s", path)
-				return nil
-			})
+			possibleYarnCacheFolder := append([]string{s.Stager.BuildDir()}, strings.Split(yarnCacheFolder, "/")...)
 
-			if err != nil {
-				s.Log.Error("Error walking the path %v: %v", s.Stager.BuildDir(), err)
-			}
+			s.Log.Info("Possible Yarn cache folder: %v", possibleYarnCacheFolder)
 
-			if s.IsVendored, err = libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), ".yarn", "cache")); err != nil {
+			yarnCacheDirExists, err2 := libbuildpack.FileExists(filepath.Join(possibleYarnCacheFolder...))
+
+			s.Log.Info("Yarn cache folder exists: %t", yarnCacheDirExists)
+
+			if err2 != nil {
 				s.Log.Info("Yarn cache folder seemingly does not exist: %s", err)
 				return err
+			}
+
+			if yarnCacheDirExists {
+				s.IsVendored = true
 			}
 		}
 	}
