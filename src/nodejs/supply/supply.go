@@ -413,16 +413,13 @@ func (s *Supplier) ReadPackageJSON() error {
 	if s.UseYarn, err = libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), "yarn.lock")); err != nil {
 		return err
 	}
-	s.Log.Info("UseYarn after first if check for yarn.lock: %t", s.UseYarn)
 
 	// If we didn't find yarn.lock, check if we have a .yarn folder and set UseYarn to true if we do
 	if !s.UseYarn {
-		s.Log.Info("UseYarn before second if check for .yarn: %t", s.UseYarn)
 		if s.UseYarn, err = libbuildpack.FileExists(filepath.Join(s.Stager.BuildDir(), ".yarn")); err != nil {
 			return err
 		}
 	}
-	s.Log.Info("UseYarn after second if check for .yarn: %t", s.UseYarn)
 
 	// If we are using Yarn then we need to check if the cache folder exists for Yarn berry Zero Installs
 	if s.UseYarn {
@@ -433,31 +430,13 @@ func (s *Supplier) ReadPackageJSON() error {
 
 		isYarnV1 := strings.HasPrefix(yarnVersion, "1")
 
-		s.Log.Info("yarnCacheFolder: %s", yarnCacheFolder)
-		s.Log.Info("yarnVersion: %s", yarnVersion)
-		s.Log.Info("yarnNodeLinker: %s", yarnNodeLinker)
-		s.Log.Info("isYarnV1: %t", isYarnV1)
-		s.Log.Info("stager builddir: %s", s.Stager.BuildDir())
-		s.Log.Info("combined dir: %s", filepath.Join(s.Stager.BuildDir(), ".yarn", "cache"))
-
 		if !isYarnV1 && yarnNodeLinker == "pnp" {
-			s.Log.Info("Yarn Berry is using Plug'n'Play (PnP) mode, detecting if Zero Installs is enabled by checking if the Yarn cache folder exists. For more information visit https://yarnpkg.com/features/pnp")
-
-			yarnCacheDirExists, err2 := libbuildpack.FileExists(filepath.Join(yarnCacheFolder))
-
-			s.Log.Info("Yarn cache folder exists: %t", yarnCacheDirExists)
-
-			if err2 != nil {
-				s.Log.Info("Yarn cache folder seemingly does not exist: %s", err)
+			s.Log.Info("Yarn Berry is using Plug'n'Play (PnP) mode, detecting if Zero Installs is enabled by checking if the Yarn cache folder exists. For more info visit https://yarnpkg.com/features/caching#zero-installs")
+			if s.IsVendored, err = libbuildpack.FileExists(filepath.Join(yarnCacheFolder)); err != nil {
 				return err
-			}
-
-			if yarnCacheDirExists {
-				s.IsVendored = true
 			}
 		}
 	}
-	s.Log.Info("IsVendored after checking it the yarn way: %t", s.IsVendored)
 
 	// If IsVendored was not set to true then we're either using Yarn without Zero Installs, or we're using NPM
 	if !s.IsVendored {
